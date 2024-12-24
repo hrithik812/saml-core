@@ -21,7 +21,6 @@ router.post('/saveInfo',  async(req, res) => {
             occupation,
             mobileNo,
         });
-   console.log("Client info----",client);
    
         // Then, create the UserClient record
         const userClient = await userclient.create({
