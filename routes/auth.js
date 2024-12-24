@@ -1,28 +1,28 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { User,Feature,Role } = require('../models');
+const { users,features,roles } = require('../models');
 const router = express.Router();
 const bcrypt = require('bcryptjs'); // Import bcrypt
 
 const SECRET_KEY = '123456';
 const getUserFeatures = async (username) => {
   try {
-    const user = await User.findOne({
+    const user = await users.findOne({
       where: { username },
       include: [
         {
-          model: Role,
+          model: roles,
           through: { attributes: [] }, // Exclude intermediate table attributes
           include: [
             {
-              model: Feature,
+              model: features,
               through: { attributes: [] }, // Exclude intermediate table attributes
             },
           ],
         },
       ],
     });
-
+  
     if (!user) {
       return { message: 'User not found', features: [] };
     }
@@ -38,13 +38,13 @@ const getUserFeatures = async (username) => {
         password: user.password,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-        Roles: user.Roles.map(role => ({
+        Roles: user.roles.map(role => ({
           id: role.id,
           name: role.name,
           description: role.description,
           createdAt: role.createdAt,
           updatedAt: role.updatedAt,
-          Features: role.Features.map(feature => ({
+          Features: role.features.map(feature => ({
             id: feature.id,
             name: feature.name,
             createdAt: feature.createdAt,
@@ -82,11 +82,11 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ where: { username } });
+    const user = await users.findOne({ where: { username } });
     
+     
     
-    
-    if (!user) {
+      if(!user) {
         return res.status(404).json({ message: 'User not found' });
       }
 
@@ -98,7 +98,7 @@ router.post('/login', async (req, res) => {
       }
     const data = await getUserFeatures(user.username);
       
-  
+
     const token = jwt.sign({ id: user.id, role: user.role }, SECRET_KEY, {
       expiresIn: '1h',
     });

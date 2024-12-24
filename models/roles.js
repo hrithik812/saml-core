@@ -2,22 +2,22 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Role extends Model {
+  class roles extends Model {
     static associate(models) {
       // Define associations here
-      Role.belongsToMany(models.User, {
-        through: 'UserRole',
+      roles.belongsToMany(models.users, {
+        through: 'userroles',
         foreignKey: 'roleId',
       });
 
       // Many-to-Many: Role ↔ Feature through RoleFeature
-      Role.belongsToMany(models.Feature, {
-        through: 'RoleFeature',
+      roles.belongsToMany(models.features, {
+        through: 'rolefeatures',
         foreignKey: 'roleId',
       });
     }
   }
-  Role.init(
+  roles.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -34,8 +34,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: 'Role',
+      modelName: 'roles',
     }
   );
-  return Role;
+  return roles;
 };
